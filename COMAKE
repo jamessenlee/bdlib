@@ -1,0 +1,76 @@
+#edit-mode: -*- python -*-
+#coding:gbk
+
+#工作路径.
+WORKROOT('../../../../../')
+
+# for gcc4:
+TOOLCHAIN_ROOT=ENV.WorkRoot() + '/ps/se/toolchain'
+TOOLCHAIN=TOOLCHAIN_ROOT + '/gcc_only_4.8.2'
+GCC4=TOOLCHAIN + '/bin/g++'   # 将CC/CXX都设置成g++4，加上-std=c++11会编译不过
+GCOV4=TOOLCHAIN + '/bin/gcov'
+LIB4_DIR=TOOLCHAIN + '/lib64'
+
+GCC3_COMPATIBLE_FLAGS= \
+' -fpermissive -Wno-write-strings -Wno-literal-suffix ' + \
+    '-Wno-ignored-qualifiers -Wno-unused-local-typedefs -Wno-invalid-offsetof ' + \
+    '-Wno-unused-parameter -Wno-unused-function -Wno-narrowing ' + \
+    '-D_GLIBCXX_HAVE_GTHR_DEFAULT -Wno-strict-aliasing -Wno-parentheses ' + \
+    '-Wno-unused-but-set-variable '
+
+GCC4_LDFLAGS='-static-libgcc -static-libstdc++'   # 静态链接libgcc和libstdc++
+BIN_LDFLAGS=''
+
+CC('ccache ' + GCC4)
+CXX('ccache ' + GCC4)
+
+# for gcc4:
+CONFIGS('ps/se/toolchain@toolchain_1-1-0-1_PD_BL')   # 依赖toolchain
+
+#使用硬链接copy.
+CopyUsingHardLink(True)
+#C预处理器参数.
+CPPFLAGS('-D_GNU_SOURCE -D__STDC_LIMIT_MACROS')
+CPPFLAGS(' -DNDEBUG')
+#C++编译参数.
+CXXFLAGS('-g -pipe -W -Wall -Werror -fPIC -O2')
+CXXFLAGS(GCC3_COMPATIBLE_FLAGS)
+#链接参数.
+LDFLAGS(GCC4_LDFLAGS, '-lpthread -lcrypto -lrt')
+
+#依赖库
+CONFIGS('public/configure@configure_1-2-12-0_PD_BL')
+CONFIGS('app/ecom/cm/utility@ci', IncludePaths('output/include'))
+CONFIGS('third-64/boost@boost_1-46-1-101_PD_BL',Libraries('./lib/libboost_regex.a'))
+CONFIGS('app/ecom/nova/afs/smalltable@ci')
+CONFIGS('app/ecom/nova/afs/config-io@ci')
+CONFIGS('third-64/tcmalloc@tcmalloc_2-1-0-100_PD_BL',Libraries('./lib/libtcmalloc.a'))
+
+INCPATHS('.')
+
+BS_SRC = ' ./*.cpp'
+
+Application('lib',
+            Sources(GLOB(BS_SRC))
+            + Sources('main.cpp', 
+                      ENV.CxxFlags() + CxxFlags('-DVERSION=\\\"%s\\\"'%(BuildVersion()))))
+
+
+#Unit Test App
+test_source = [
+]
+
+StaticLibrary(
+    'bdlib', 
+    Sources(GLOB(BS_SRC), ENV.CxxFlags() - CxxFlags('-O2')) - \
+        Sources('./main.cpp'))
+
+for test in test_source:
+    Application(
+        'test/' + os.path.splitext(test.split()[0])[0],
+        Sources('test/' + test,
+            ENV.CxxFlags() + CxxFlags(' -Dprivate=public -Dprotected=public ') -
+            CxxFlags('-O2')),
+        OutputPath(''),
+        Libraries('libbdlib.a'))
+
