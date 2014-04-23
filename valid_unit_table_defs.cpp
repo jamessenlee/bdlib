@@ -1,13 +1,6 @@
 #include "valid_unit_table_defs.h"
 #include <smalltable2.hpp>
-
-
-DEFINE_ATTRIBUTE(UNIT_ID, uint32_t);
-DEFINE_ATTRIBUTE(VALID_STATUS, ValidStatus);
-
-typedef ST_TABLE(
-        UNIT_ID, VALID_STATUS,
-        ST_UNIQUE_KEY(UNIT_ID)) ValidUnitTable;
+#include "table_defs.h"
 
 LibValidUnitTable::LibValidUnitTable()
     : _p_table(NULL)
@@ -27,7 +20,7 @@ LibValidUnitTable::~LibValidUnitTable()
 bool LibValidUnitTable::init(TableManager* mgr)
 {
     (static_cast<ValidUnitTable*> (_p_table))->init();
-    mgr->register_table("valid_unit",this);
+    mgr->register_table("valid_unit_table",this);
     return true;
 }
 

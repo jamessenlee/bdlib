@@ -14,10 +14,7 @@
 //CREATE UNIQUE INDEX unitid_index
 //ON UnitSiteTable (unit_id) -- sql
 
-struct ValidStatus
-{
-    bool status;
-};
+struct ValidStatus;
 
 class LibValidUnitTable : public ITable{
 public:    
@@ -40,7 +37,8 @@ public:
 
     //parameter number and type defined at compiler time
     bool earse(uint32_t unit_id);
-
+    
+    void* get_table() const {return _p_table;}
 
 private:
     void* _p_table;

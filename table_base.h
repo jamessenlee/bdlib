@@ -39,6 +39,7 @@ public:
     virtual const char* desc() = 0;
     virtual ITable* clone() = 0;
     virtual ITable& operator=(ITable& rhs) = 0;
+    virtual void* get_table() const = 0;
 
 private:
 

@@ -50,7 +50,7 @@ INCPATHS('.')
 
 BS_SRC = ' ./*.cpp'
 
-Application('lib',
+Application('a.out',
             Sources(GLOB(BS_SRC))
             + Sources('main.cpp', 
                       ENV.CxxFlags() + CxxFlags('-DVERSION=\\\"%s\\\"'%(BuildVersion()))))

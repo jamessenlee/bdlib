@@ -1,13 +1,6 @@
 #include "unit_site_table_defs.h"
 #include <smalltable2.hpp>
-
-DEFINE_ATTRIBUTE(UNIT_ID, uint32_t);
-DEFINE_ATTRIBUTE(SITE_ID, uint32_t);
-
-typedef ST_TABLE(
-        UNIT_ID, SITE_ID,
-        ST_UNIQUE_KEY(UNIT_ID, ST_CLUSTER_KEY(SITE_ID)),
-        ST_UNIQUE_KEY(UNIT_ID, SITE_ID)) UnitSiteTable;
+#include "table_defs.h"
 
 LibUnitSiteTable::LibUnitSiteTable()
     : _p_table(NULL)
@@ -28,6 +21,7 @@ bool LibUnitSiteTable::init(TableManager* mgr)
 {
     (static_cast<UnitSiteTable*> (_p_table))->init();
     mgr->register_table("unit_site_table",this);
+
     return true;
 }
 

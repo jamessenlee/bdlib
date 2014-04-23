@@ -108,11 +108,11 @@ CCP_FLAGS=
 
 
 #COMAKE UUID
-COMAKE_MD5=33c1f41f85f305b29f86cde0c17c3f79  COMAKE
+COMAKE_MD5=6f60825edd09753c5111cfe09a366c73  COMAKE
 
 
 .PHONY:all
-all:comake2_makefile_check lib libbdlib.a 
+all:comake2_makefile_check a.out libbdlib.a 
 	@echo "[[1;32;40mCOMAKE:BUILD[0m][Target:'[1;32;40mall[0m']"
 	@echo "make all done"
 
@@ -132,11 +132,17 @@ ccpclean:
 .PHONY:clean
 clean:ccpclean
 	@echo "[[1;32;40mCOMAKE:BUILD[0m][Target:'[1;32;40mclean[0m']"
-	rm -rf lib
-	rm -rf ./output/bin/lib
+	rm -rf a.out
+	rm -rf ./output/bin/a.out
 	rm -rf libbdlib.a
 	rm -rf ./output/lib/libbdlib.a
-	rm -rf lib_main.o
+	rm -rf a.out_main.o
+	rm -rf a.out_unit_site_table_defs.o
+	rm -rf a.out_valid_unit_site_table_defs.o
+	rm -rf a.out_valid_unit_table_defs.o
+	rm -rf bdlib_unit_site_table_defs.o
+	rm -rf bdlib_valid_unit_site_table_defs.o
+	rm -rf bdlib_valid_unit_table_defs.o
 
 .PHONY:dist
 dist:
@@ -155,9 +161,15 @@ love:
 	@echo "[[1;32;40mCOMAKE:BUILD[0m][Target:'[1;32;40mlove[0m']"
 	@echo "make love done"
 
-lib:lib_main.o
-	@echo "[[1;32;40mCOMAKE:BUILD[0m][Target:'[1;32;40mlib[0m']"
-	$(CXX) lib_main.o -Xlinker "-("  ../../../../../app/ecom/cm/utility/libcm_utility.a \
+a.out:a.out_main.o \
+  a.out_unit_site_table_defs.o \
+  a.out_valid_unit_site_table_defs.o \
+  a.out_valid_unit_table_defs.o
+	@echo "[[1;32;40mCOMAKE:BUILD[0m][Target:'[1;32;40ma.out[0m']"
+	$(CXX) a.out_main.o \
+  a.out_unit_site_table_defs.o \
+  a.out_valid_unit_site_table_defs.o \
+  a.out_valid_unit_table_defs.o -Xlinker "-("  ../../../../../app/ecom/cm/utility/libcm_utility.a \
   ../../../../../app/ecom/nova/afs/config-io/libconfigio.a \
   ../../../../../app/ecom/nova/afs/dynamic-protobuf/libdynamicprotobuf.a \
   ../../../../../app/ecom/nova/afs/smalltable/libsmalltable.a \
@@ -190,19 +202,122 @@ lib:lib_main.o
   -static-libstdc++ \
   -lpthread \
   -lcrypto \
-  -lrt -Xlinker "-)" -o lib
+  -lrt -Xlinker "-)" -o a.out
 	mkdir -p ./output/bin
-	cp -f --link lib ./output/bin
+	cp -f --link a.out ./output/bin
 
-libbdlib.a:
+libbdlib.a:bdlib_unit_site_table_defs.o \
+  bdlib_valid_unit_site_table_defs.o \
+  bdlib_valid_unit_table_defs.o
 	@echo "[[1;32;40mCOMAKE:BUILD[0m][Target:'[1;32;40mlibbdlib.a[0m']"
-	ar crs libbdlib.a 
+	ar crs libbdlib.a bdlib_unit_site_table_defs.o \
+  bdlib_valid_unit_site_table_defs.o \
+  bdlib_valid_unit_table_defs.o
 	mkdir -p ./output/lib
 	cp -f --link libbdlib.a ./output/lib
 
-lib_main.o:main.cpp
-	@echo "[[1;32;40mCOMAKE:BUILD[0m][Target:'[1;32;40mlib_main.o[0m']"
-	$(CXX) -c $(INCPATH) $(DEP_INCPATH) $(CPPFLAGS) $(CXXFLAGS)  -o lib_main.o main.cpp
+a.out_main.o:main.cpp \
+  unit_site_table_defs.h \
+  table_base.h \
+  valid_unit_table_defs.h
+	@echo "[[1;32;40mCOMAKE:BUILD[0m][Target:'[1;32;40ma.out_main.o[0m']"
+	$(CXX) -c $(INCPATH) $(DEP_INCPATH) $(CPPFLAGS) $(CXXFLAGS)  -o a.out_main.o main.cpp
+
+a.out_unit_site_table_defs.o:unit_site_table_defs.cpp \
+  unit_site_table_defs.h \
+  table_base.h \
+  table_defs.h
+	@echo "[[1;32;40mCOMAKE:BUILD[0m][Target:'[1;32;40ma.out_unit_site_table_defs.o[0m']"
+	$(CXX) -c $(INCPATH) $(DEP_INCPATH) $(CPPFLAGS) $(CXXFLAGS)  -o a.out_unit_site_table_defs.o unit_site_table_defs.cpp
+
+a.out_valid_unit_site_table_defs.o:valid_unit_site_table_defs.cpp \
+  unit_site_table_defs.h \
+  table_base.h \
+  table_defs.h
+	@echo "[[1;32;40mCOMAKE:BUILD[0m][Target:'[1;32;40ma.out_valid_unit_site_table_defs.o[0m']"
+	$(CXX) -c $(INCPATH) $(DEP_INCPATH) $(CPPFLAGS) $(CXXFLAGS)  -o a.out_valid_unit_site_table_defs.o valid_unit_site_table_defs.cpp
+
+a.out_valid_unit_table_defs.o:valid_unit_table_defs.cpp \
+  valid_unit_table_defs.h \
+  table_base.h \
+  table_defs.h
+	@echo "[[1;32;40mCOMAKE:BUILD[0m][Target:'[1;32;40ma.out_valid_unit_table_defs.o[0m']"
+	$(CXX) -c $(INCPATH) $(DEP_INCPATH) $(CPPFLAGS) $(CXXFLAGS)  -o a.out_valid_unit_table_defs.o valid_unit_table_defs.cpp
+
+bdlib_unit_site_table_defs.o:unit_site_table_defs.cpp \
+  unit_site_table_defs.h \
+  table_base.h \
+  table_defs.h
+	@echo "[[1;32;40mCOMAKE:BUILD[0m][Target:'[1;32;40mbdlib_unit_site_table_defs.o[0m']"
+	$(CXX) -c $(INCPATH) $(DEP_INCPATH) $(CPPFLAGS) -g \
+  -pipe \
+  -W \
+  -Wall \
+  -Werror \
+  -fPIC \
+  -fpermissive \
+  -Wno-write-strings \
+  -Wno-literal-suffix \
+  -Wno-ignored-qualifiers \
+  -Wno-unused-local-typedefs \
+  -Wno-invalid-offsetof \
+  -Wno-unused-parameter \
+  -Wno-unused-function \
+  -Wno-narrowing \
+  -D_GLIBCXX_HAVE_GTHR_DEFAULT \
+  -Wno-strict-aliasing \
+  -Wno-parentheses \
+  -Wno-unused-but-set-variable  -o bdlib_unit_site_table_defs.o unit_site_table_defs.cpp
+
+bdlib_valid_unit_site_table_defs.o:valid_unit_site_table_defs.cpp \
+  unit_site_table_defs.h \
+  table_base.h \
+  table_defs.h
+	@echo "[[1;32;40mCOMAKE:BUILD[0m][Target:'[1;32;40mbdlib_valid_unit_site_table_defs.o[0m']"
+	$(CXX) -c $(INCPATH) $(DEP_INCPATH) $(CPPFLAGS) -g \
+  -pipe \
+  -W \
+  -Wall \
+  -Werror \
+  -fPIC \
+  -fpermissive \
+  -Wno-write-strings \
+  -Wno-literal-suffix \
+  -Wno-ignored-qualifiers \
+  -Wno-unused-local-typedefs \
+  -Wno-invalid-offsetof \
+  -Wno-unused-parameter \
+  -Wno-unused-function \
+  -Wno-narrowing \
+  -D_GLIBCXX_HAVE_GTHR_DEFAULT \
+  -Wno-strict-aliasing \
+  -Wno-parentheses \
+  -Wno-unused-but-set-variable  -o bdlib_valid_unit_site_table_defs.o valid_unit_site_table_defs.cpp
+
+bdlib_valid_unit_table_defs.o:valid_unit_table_defs.cpp \
+  valid_unit_table_defs.h \
+  table_base.h \
+  table_defs.h
+	@echo "[[1;32;40mCOMAKE:BUILD[0m][Target:'[1;32;40mbdlib_valid_unit_table_defs.o[0m']"
+	$(CXX) -c $(INCPATH) $(DEP_INCPATH) $(CPPFLAGS) -g \
+  -pipe \
+  -W \
+  -Wall \
+  -Werror \
+  -fPIC \
+  -fpermissive \
+  -Wno-write-strings \
+  -Wno-literal-suffix \
+  -Wno-ignored-qualifiers \
+  -Wno-unused-local-typedefs \
+  -Wno-invalid-offsetof \
+  -Wno-unused-parameter \
+  -Wno-unused-function \
+  -Wno-narrowing \
+  -D_GLIBCXX_HAVE_GTHR_DEFAULT \
+  -Wno-strict-aliasing \
+  -Wno-parentheses \
+  -Wno-unused-but-set-variable  -o bdlib_valid_unit_table_defs.o valid_unit_table_defs.cpp
 
 endif #ifeq ($(shell uname -m),x86_64)
 
